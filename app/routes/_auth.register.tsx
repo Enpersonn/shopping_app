@@ -1,4 +1,7 @@
-import { Form } from "@remix-run/react";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { Form, redirect } from "@remix-run/react";
+import { createServerClient, parseCookieHeader } from "@supabase/ssr";
+import { commitSession, getSession } from "../sessions";
 
 export default function Register() {
 	return (
@@ -52,4 +55,57 @@ export default function Register() {
 			</button>
 		</Form>
 	);
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+	const formData = await request.formData();
+	const name = formData.get("name");
+	const email = formData.get("email");
+	const password = formData.get("password");
+	const confirmPassword = formData.get("confirmPassword");
+
+	if (password !== confirmPassword) {
+		return new Response(JSON.stringify({ error: "Passwords do not match" }), {
+			status: 400,
+		});
+	}
+
+	const supabaseUrl = process.env.SUPABASE_URL ?? "";
+	const supabaseAnonKey = process.env.SUPABASE_ANON_KEY ?? "";
+
+	const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+		cookies: {
+			getAll() {
+				return parseCookieHeader(request.headers.get("Cookie") ?? "");
+			},
+		},
+	});
+
+	const { data, error } = await supabase.auth.signUp({
+		email: email as string,
+		password: password as string,
+		options: {
+			data: { name: name as string },
+		},
+	});
+
+	if (error) {
+		return new Response(JSON.stringify({ error: error.message }), {
+			status: 400,
+		});
+	}
+
+	const session = await getSession(request.headers.get("Cookie"));
+
+	session.set("user", {
+		id: data.user?.id ?? "",
+		email: data.user?.email ?? "",
+		name: data.user?.user_metadata.full_name ?? "",
+	});
+
+	return redirect("/", {
+		headers: {
+			"Set-Cookie": await commitSession(session),
+		},
+	});
 }

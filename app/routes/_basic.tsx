@@ -1,6 +1,25 @@
-import { Link, Outlet } from "@remix-run/react";
+import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { Link, Outlet, Form, useLoaderData } from "@remix-run/react";
+import { getSession } from "../sessions";
+
+export const meta: MetaFunction = () => {
+	return [
+		{ title: "New Remix App" },
+		{ name: "description", content: "Welcome to Remix!" },
+	];
+};
+
+export async function loader({ request }: LoaderFunctionArgs) {
+	const session = await getSession(request.headers.get("Cookie"));
+
+	return { user: session.get("user") };
+}
 
 export default function Basic() {
+	const { user } = useLoaderData<typeof loader>();
+
+	console.log(user);
+
 	return (
 		<>
 			<div className="min-h-screen">
@@ -8,9 +27,17 @@ export default function Basic() {
 					<p>test</p>
 					<p>test</p>
 					<div>
-						<Link to="/login" className="hover:underline">
-							Login
-						</Link>
+						{user ? (
+							<Form method="post" action="/signout" className="hover:underline">
+								<button type="submit">Sign Out</button>
+							</Form>
+						) : (
+							<>
+								<Link to="/login" className="hover:underline">
+									Login
+								</Link>
+							</>
+						)}
 					</div>
 				</nav>
 				<Outlet />
