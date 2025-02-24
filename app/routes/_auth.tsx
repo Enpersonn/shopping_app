@@ -1,8 +1,16 @@
-import { Link, Outlet, useLocation } from "@remix-run/react";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { Link, Outlet, useLocation, useLoaderData } from "@remix-run/react";
+import { getSession } from "../sessions";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+	const session = await getSession(request.headers.get("Cookie"));
+
+	return { isValidSession: !!session.get("user") };
+}
 
 export default function Auth() {
+	const { isValidSession } = useLoaderData<typeof loader>();
 	const location = useLocation();
-
 	const isLogin = location.pathname === "/login";
 
 	return (
@@ -18,10 +26,16 @@ export default function Auth() {
 
 							<div>
 								<Link
-									to={!isLogin ? "/login" : "/register"}
+									to={
+										isValidSession
+											? "/signout"
+											: !isLogin
+												? "/login"
+												: "/register"
+									}
 									className=" hover:font-bold transition-all"
 								>
-									{isLogin ? "Register" : "Login"}
+									{isValidSession ? "Sign Out" : isLogin ? "Register" : "Login"}
 								</Link>
 							</div>
 						</div>

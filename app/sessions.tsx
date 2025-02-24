@@ -19,7 +19,7 @@ const { getSession, commitSession, destroySession } =
 			path: "/",
 			httpOnly: true,
 			sameSite: "lax",
-			secrets: ["s3cr3t"],
+			secrets: [process.env.SESSION_SECRET ?? "s3cr3t"],
 		},
 	});
 

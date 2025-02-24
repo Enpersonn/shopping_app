@@ -1,6 +1,6 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet, Form, useLoaderData } from "@remix-run/react";
-import { getSession } from "../sessions";
+import { getUser } from "../utils/authservice";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -10,21 +10,21 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const session = await getSession(request.headers.get("Cookie"));
+	const user = await getUser(request);
 
-	return { user: session.get("user") };
+	return { user };
 }
 
 export default function Basic() {
-	const { user } = useLoaderData<typeof loader>();
-
-	console.log(user);
+	const user = useLoaderData<typeof loader>();
 
 	return (
 		<>
 			<div className="min-h-screen">
 				<nav className="fixed top-0 left-0 w-full px-6 py-4 h-16 bg-black/25 flex justify-between items-center backdrop-blur-sm border-b border-gray-700">
-					<p>test</p>
+					<Link to="/profile" className="hover:underline">
+						Profile
+					</Link>
 					<p>test</p>
 					<div>
 						{user ? (

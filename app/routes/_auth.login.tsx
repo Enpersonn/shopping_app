@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Form, redirect } from "@remix-run/react";
-import { createServerClient, parseCookieHeader } from "@supabase/ssr";
-import { getSession, commitSession } from "../sessions";
+import { commitSession } from "../sessions";
+import { login } from "../utils/authservice";
 
 export default function Login() {
 	return (
@@ -44,35 +44,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	const email = formData.get("email");
 	const password = formData.get("password");
 
-	const supabaseUrl = process.env.SUPABASE_URL ?? "";
-	const supabaseAnonKey = process.env.SUPABASE_ANON_KEY ?? "";
-
-	const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-		cookies: {
-			getAll() {
-				return parseCookieHeader(request.headers.get("Cookie") ?? "");
-			},
-		},
-	});
-
-	const { data, error } = await supabase.auth.signInWithPassword({
-		email: email as string,
-		password: password as string,
-	});
-
-	if (error) {
-		return new Response(JSON.stringify({ error: error.message }), {
-			status: 400,
-		});
-	}
-
-	const session = await getSession(request.headers.get("Cookie"));
-
-	session.set("user", {
-		id: data.user?.id ?? "",
-		email: data.user?.email ?? "",
-		name: data.user?.user_metadata.full_name ?? "",
-	});
+	const session = await login(request, email as string, password as string);
 
 	return redirect("/", {
 		headers: { "Set-Cookie": await commitSession(session) },
