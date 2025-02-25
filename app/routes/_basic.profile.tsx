@@ -4,7 +4,7 @@ import { getUser } from "../utils/authservice";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const user = await getUser(request);
-	return user;
+	return user ?? null;
 }
 
 export default function Profile() {
