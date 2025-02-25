@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, redirect, useLoaderData } from "@remix-run/react";
 import { commitSession } from "../sessions";
-import { updateUser, getUser } from "../utils/authservice";
+import { updateUser, getUser } from "../utils/supabase/auth_service";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const user = await getUser(request);
@@ -10,7 +10,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Edit() {
 	const user = useLoaderData<typeof loader>();
-
+	console.log(user);
 	return (
 		<Form
 			method="post"

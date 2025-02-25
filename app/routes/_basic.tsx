@@ -1,6 +1,6 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet, Form, useLoaderData } from "@remix-run/react";
-import { getUser } from "../utils/authservice";
+import { getUser } from "../utils/supabase/auth_service";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -11,23 +11,29 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const user = await getUser(request);
-
-	return { user };
+	const isValidSession = !!user;
+	return { isValidSession };
 }
 
 export default function Basic() {
-	const user = useLoaderData<typeof loader>();
+	const { isValidSession } = useLoaderData<typeof loader>();
 
 	return (
 		<>
 			<div className="min-h-screen">
 				<nav className="fixed top-0 left-0 w-full px-6 py-4 h-16 bg-black/25 flex justify-between items-center backdrop-blur-sm border-b border-gray-700">
-					<Link to="/profile" className="hover:underline">
-						Profile
-					</Link>
-					<p>test</p>
 					<div>
-						{user ? (
+						{isValidSession && (
+							<Link to="/profile" className="hover:underline">
+								Profile
+							</Link>
+						)}
+					</div>
+					<nav>
+						<p>test</p>
+					</nav>
+					<div>
+						{isValidSession ? (
 							<Form method="post" action="/signout" className="hover:underline">
 								<button type="submit">Sign Out</button>
 							</Form>

@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Form, redirect } from "@remix-run/react";
 import { commitSession } from "../sessions";
-import { signup } from "../utils/authservice";
+import { signup } from "../utils/supabase/auth_service";
 
 export default function Register() {
 	return (

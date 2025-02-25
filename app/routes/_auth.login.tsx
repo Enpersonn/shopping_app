@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { Form, redirect } from "@remix-run/react";
 import { commitSession } from "../sessions";
-import { login } from "../utils/authservice";
+import { login } from "../utils/supabase/auth_service";
 
 export default function Login() {
 	return (

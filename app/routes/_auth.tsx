@@ -1,5 +1,11 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, Outlet, useLocation, useLoaderData } from "@remix-run/react";
+import {
+	Link,
+	Outlet,
+	useLocation,
+	useLoaderData,
+	Form,
+} from "@remix-run/react";
 import { getSession } from "../sessions";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -25,18 +31,22 @@ export default function Auth() {
 							</Link>
 
 							<div>
-								<Link
-									to={
-										isValidSession
-											? "/signout"
-											: !isLogin
-												? "/login"
-												: "/register"
-									}
-									className=" hover:font-bold transition-all"
-								>
-									{isValidSession ? "Sign Out" : isLogin ? "Register" : "Login"}
-								</Link>
+								{isValidSession ? (
+									<Form
+										method="post"
+										action="/signout"
+										className=" hover:font-bold transition-all"
+									>
+										<button type="submit">Sign Out</button>
+									</Form>
+								) : (
+									<Link
+										to={!isLogin ? "/login" : "/register"}
+										className=" hover:font-bold transition-all"
+									>
+										{isLogin ? "Register" : "Login"}
+									</Link>
+								)}
 							</div>
 						</div>
 						<Outlet />
