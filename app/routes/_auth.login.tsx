@@ -1,4 +1,7 @@
-import { Form } from "@remix-run/react";
+import type { ActionFunctionArgs } from "@remix-run/node";
+import { Form, redirect } from "@remix-run/react";
+import { commitSession } from "../sessions";
+import { login } from "../utils/supabase/auth_service";
 
 export default function Login() {
 	return (
@@ -34,4 +37,16 @@ export default function Login() {
 			</button>
 		</Form>
 	);
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+	const formData = await request.formData();
+	const email = formData.get("email");
+	const password = formData.get("password");
+
+	const session = await login(request, email as string, password as string);
+
+	return redirect("/", {
+		headers: { "Set-Cookie": await commitSession(session) },
+	});
 }

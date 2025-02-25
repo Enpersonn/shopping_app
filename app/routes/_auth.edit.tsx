@@ -1,9 +1,16 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { Form, redirect } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { Form, redirect, useLoaderData } from "@remix-run/react";
 import { commitSession } from "../sessions";
-import { signup } from "../utils/supabase/auth_service";
+import { updateUser, getUser } from "../utils/supabase/auth_service";
 
-export default function Register() {
+export async function loader({ request }: LoaderFunctionArgs) {
+	const user = await getUser(request);
+	return user;
+}
+
+export default function Edit() {
+	const user = useLoaderData<typeof loader>();
+	console.log(user);
 	return (
 		<Form
 			method="post"
@@ -17,6 +24,7 @@ export default function Register() {
 						name="name"
 						id="name"
 						className="border-2 border-gray-300 rounded-md p-2"
+						defaultValue={user?.name}
 					/>
 				</div>
 				<div className="flex flex-col gap-2">
@@ -26,24 +34,7 @@ export default function Register() {
 						name="email"
 						id="email"
 						className="border-2 border-gray-300 rounded-md p-2"
-					/>
-				</div>
-				<div className="flex flex-col gap-2">
-					<label htmlFor="password">Password</label>
-					<input
-						type="password"
-						name="password"
-						id="password"
-						className="border-2 border-gray-300 rounded-md p-2"
-					/>
-				</div>
-				<div className="flex flex-col gap-2">
-					<label htmlFor="confirmPassword">Confirm Password</label>
-					<input
-						type="password"
-						name="confirmPassword"
-						id="confirmPassword"
-						className="border-2 border-gray-300 rounded-md p-2"
+						defaultValue={user?.email}
 					/>
 				</div>
 			</div>
@@ -51,7 +42,7 @@ export default function Register() {
 				type="submit"
 				className=" border-[1px] border-gray-300 text-white p-2 rounded-md"
 			>
-				Register
+				Update
 			</button>
 		</Form>
 	);
@@ -61,16 +52,8 @@ export async function action({ request }: ActionFunctionArgs) {
 	const formData = await request.formData();
 	const name = formData.get("name");
 	const email = formData.get("email");
-	const password = formData.get("password");
-	const confirmPassword = formData.get("confirmPassword");
 
-	const session = await signup(
-		request,
-		name as string,
-		email as string,
-		password as string,
-		confirmPassword as string,
-	);
+	const session = await updateUser(request, email as string, name as string);
 
 	return redirect("/", {
 		headers: {
