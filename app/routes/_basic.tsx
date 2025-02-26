@@ -1,6 +1,7 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { Link, Outlet, Form, useLoaderData } from "@remix-run/react";
 import { getUser } from "../utils/supabase/auth_service";
+import { requireAdmin } from "~/utils/auth/auth-server";
 
 export const meta: MetaFunction = () => {
 	return [
@@ -12,16 +13,16 @@ export const meta: MetaFunction = () => {
 export async function loader({ request }: LoaderFunctionArgs) {
 	const user = await getUser(request);
 	const isValidSession = !!user;
-	return { isValidSession };
+	const isAdmin = await requireAdmin(request, false);
+	return { isValidSession, isAdmin };
 }
 
 export default function Basic() {
-	const { isValidSession } = useLoaderData<typeof loader>();
-
+	const { isValidSession, isAdmin } = useLoaderData<typeof loader>();
 	return (
 		<>
 			<div className="min-h-screen">
-				<nav className="fixed top-0 left-0 w-full px-6 py-4 h-16 bg-black/25 flex justify-between items-center backdrop-blur-sm border-b border-gray-700">
+				<nav className="fixed top-0 left-0 w-full px-6 py-4 h-16 bg-black text-white flex justify-between items-center backdrop-blur-sm border-b border-gray-700">
 					<div>
 						{isValidSession && (
 							<Link to="/profile" className="hover:underline">
@@ -29,8 +30,13 @@ export default function Basic() {
 							</Link>
 						)}
 					</div>
-					<nav>
+					<nav className="flex gap-4">
 						<p>test</p>
+						{isAdmin && (
+							<Link to="/admin" className="hover:underline">
+								Admin
+							</Link>
+						)}
 					</nav>
 					<div>
 						{isValidSession ? (
@@ -38,11 +44,9 @@ export default function Basic() {
 								<button type="submit">Sign Out</button>
 							</Form>
 						) : (
-							<>
-								<Link to="/login" className="hover:underline">
-									Login
-								</Link>
-							</>
+							<Link to="/login" className="hover:underline">
+								Login
+							</Link>
 						)}
 					</div>
 				</nav>

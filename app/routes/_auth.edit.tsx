@@ -10,20 +10,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Edit() {
 	const user = useLoaderData<typeof loader>();
-	console.log(user);
 	return (
 		<Form
 			method="post"
-			className="flex flex-col h-full justify-between gap-5 px-12 py-8"
+			className="flex flex-col h-full justify-between gap-5 px-6 py-8"
 		>
-			<div className="grid grid-rows-4 gap-2">
+			<div className="grid grid-cols-2 grid-rows-4 gap-2">
 				<div className="flex flex-col gap-2">
 					<label htmlFor="name">Name</label>
 					<input
 						type="text"
 						name="name"
 						id="name"
-						className="border-2 border-gray-300 rounded-md p-2"
+						className="border-b-2   p-2"
 						defaultValue={user?.name}
 					/>
 				</div>
@@ -33,14 +32,14 @@ export default function Edit() {
 						type="text"
 						name="email"
 						id="email"
-						className="border-2 border-gray-300 rounded-md p-2"
+						className="border-b-2   p-2"
 						defaultValue={user?.email}
 					/>
 				</div>
 			</div>
 			<button
 				type="submit"
-				className=" border-[1px] border-gray-300 text-white p-2 rounded-md"
+				className=" border-[1px] hover:bg-slate-50  p-2 rounded-md"
 			>
 				Update
 			</button>

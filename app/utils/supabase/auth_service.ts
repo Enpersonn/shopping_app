@@ -15,7 +15,6 @@ export async function handleAuthResponse(
 	data: SessionData | null,
 	error: Error | null,
 ) {
-	console.log(data);
 	if (error) {
 		console.error("Authentication error:", error);
 		throw new Response(
