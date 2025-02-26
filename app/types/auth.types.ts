@@ -15,16 +15,19 @@ export enum Roles {
 }
 
 export type SessionData = {
-	user: {
-		name?: string;
-		id?: string;
-		email?: string;
-		role?: string;
-		permissions?: string[];
-		lastLogin?: string;
-	} | null;
+	user: User | null;
 };
 
+export type User = {
+	name?: string;
+	id?: string;
+	email?: string;
+	role?: string;
+	permissions?: string[];
+	lastLogin?: string;
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	additionalInfo?: any;
+};
 export type SessionFlashData = {
 	error: string;
 };

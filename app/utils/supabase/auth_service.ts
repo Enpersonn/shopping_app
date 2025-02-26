@@ -53,6 +53,9 @@ export async function login(request: Request, email: string, password: string) {
 		.eq("user_id", authData.user?.id);
 	// @ts-expect-error - permissions is an array of permissions
 	const permissions = roleData?.flatMap((role) => role.roles.permissions) || [];
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
 
 	const data = {
 		user: {
@@ -60,6 +63,7 @@ export async function login(request: Request, email: string, password: string) {
 			email: authData.user?.email,
 			name: authData.user?.user_metadata?.name,
 			permissions: permissions,
+			additionalInfo: user,
 		},
 	};
 
@@ -100,7 +104,7 @@ export async function signup(
 		.from("roles")
 		.select("permissions")
 		.eq("name", "customer");
-
+	console.log(roleData);
 	const permissions = roleData?.flatMap((role) => role.permissions);
 
 	const data = {
