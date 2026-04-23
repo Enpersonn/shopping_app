@@ -1,8 +1,8 @@
 import { Link, Form, useLocation } from "@remix-run/react";
-import Button from "../../components/button";
 import type { User } from "~/types/auth.types";
 import { cn } from "../../utils/classes";
 import Input from "../../components/input";
+import { Button } from "~/components/ui/button";
 
 export default function AuthView({
 	user,
@@ -18,24 +18,20 @@ export default function AuthView({
 				<div className="col-span-6 col-start-4 h-full">
 					<div className="border border-gray-300 shadow-sm mt-[10vh] rounded-md p-4 flex flex-col gap-12">
 						<div className="flex w-full justify-between ">
-							<Link
-								to="/"
-								className=" border-[1px] hover:bg-slate-50 no-underline px-6 py-2 rounded-md"
-							>
-								Home
-							</Link>
+							<Button variant="outline" size="lg" asChild>
+								<Link to="/">Home</Link>
+							</Button>
 
 							{isValidSession ? (
 								<Form method="post" action="/signout">
 									<Button type="submit">Sign Out</Button>
 								</Form>
 							) : (
-								<Link
-									to={!isLogin ? "/login" : "/register"}
-									className=" border-[1px] hover:bg-slate-50 no-underline px-6 py-2 rounded-md"
-								>
-									{isLogin ? "Register" : "Login"}
-								</Link>
+								<Button size="lg" asChild>
+									<Link to={!isLogin ? "/login" : "/register"}>
+										{isLogin ? "Register" : "Login"}
+									</Link>
+								</Button>
 							)}
 						</div>
 						<Form method="post" action={location.pathname}>

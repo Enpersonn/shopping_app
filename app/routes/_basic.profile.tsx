@@ -13,11 +13,16 @@ export default function Profile() {
 	const { user } = useLoaderData<typeof loader>();
 	return (
 		<div className="flex flex-col h-full justify-between gap-5 px-12 pt-24">
-			<Card className=" justify-between p-4">
-				<h1 className="text-4xl ">Welcome {user?.name}</h1>
-				<Button asChild variant="outline">
-					<Link to="/edit">Edit</Link>
-				</Button>
+			<Card className=" p-4">
+				<div className="flex justify-between items-start">
+					<div className="flex flex-col gap-2">
+						<h1 className="text-4xl font-medium ">{user?.name}</h1>
+						<p className="text-sm text-muted-foreground">{user?.email}</p>
+					</div>
+					<Button asChild variant="outline">
+						<Link to="/edit">Edit</Link>
+					</Button>
+				</div>
 			</Card>
 		</div>
 	);
